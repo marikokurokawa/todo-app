@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="toolbar">
+  <span class="meta">全 {{ todos|length }} 件（期日が近い順）</span>
+  <a class="btn" href="{{ url_for('new_todo') }}">＋ 新しいやること</a>
+</div>
+
+{% if todos %}
+  {% for t in todos %}
+    {% set overdue = t.due_date and t.due_date < today %}
+    <div class="card{% if overdue %} overdue{% endif %}">
+      <h2>{{ t.title }}</h2>
+      <div class="meta">
+        期日：<span class="due">{{ t.due_date or "未設定" }}</span>
+        {% if overdue %}（期限切れ）{% elif t.due_date == today %}（今日まで）{% endif %}
+      </div>
+      {% if t.content %}<div class="content">{{ t.content }}</div>{% endif %}
+      <div class="meta">更新：{{ t.updated_at }}</div>
+      <div class="actions">
+        <a class="btn small sub" href="{{ url_for('edit_todo', todo_id=t.id) }}">編集</a>
+        <form method="post" action="{{ url_for('remove_todo', todo_id=t.id) }}"
+              onsubmit="return confirm('「{{ t.title|e }}」を削除しますか？');">
+          <button class="btn small danger" type="submit">削除</button>
+        </form>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="empty">やることはまだありません。<br>「＋ 新しいやること」から登録しましょう。</div>
+{% endif %}
+{% endblock %}
