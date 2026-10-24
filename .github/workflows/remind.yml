@@ -1,0 +1,28 @@
+# 毎朝8時（日本時間）にアプリの /cron/remind を呼び出し、
+# 明日が期日のやることをLINEに送る
+name: LINE reminder
+
+on:
+  schedule:
+    - cron: "0 23 * * *"   # UTCの23:00 = 日本時間の8:00
+  workflow_dispatch:        # GitHubの画面から手動でも実行できる
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call reminder endpoint
+        run: |
+          # Renderの無料プランは休止中だと起動に時間がかかるので、最大3回まで試す
+          for i in 1 2 3; do
+            if curl -fsS --max-time 120 -X POST \
+                 -H "X-Cron-Token: ${{ secrets.CRON_SECRET }}" \
+                 "${{ secrets.REMIND_URL }}"; then
+              echo ""
+              echo "OK"
+              exit 0
+            fi
+            echo "retry $i"
+            sleep 20
+          done
+          exit 1
