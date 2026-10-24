@@ -37,6 +37,30 @@
     .req { color:var(--danger); font-size:.8rem; margin-left:4px; }
     .toolbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
     .empty { text-align:center; color:var(--muted); padding:40px 0; }
+    select { padding:9px 10px; border:1px solid #ccd3e0; border-radius:6px; font-size:1rem;
+             font-family:inherit; background:#fff; }
+    /* 絞り込みタブ */
+    .tabs { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+    .tab { padding:6px 14px; border-radius:999px; background:#e3e8f2; color:var(--text);
+           text-decoration:none; font-size:.9rem; }
+    .tab.active { background:var(--main); color:#fff; }
+    .sortbar { display:flex; align-items:center; gap:8px; font-size:.9rem; color:var(--muted); }
+    .sortbar select { padding:5px 8px; font-size:.9rem; }
+    /* 重要度バッジ */
+    .badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.75rem;
+             font-weight:bold; vertical-align:middle; margin-right:6px; }
+    .badge.high { background:#fde8e8; color:#a12626; }
+    .badge.medium { background:#fff4d6; color:#8a5a00; }
+    .badge.low { background:#e3e8f2; color:#4a5568; }
+    .card.priority-high { border-top:3px solid var(--danger); }
+    /* 完了済み */
+    .card.done { opacity:.6; }
+    .card.done h2 .title-text { text-decoration:line-through; }
+    .btn.done-btn { background:#1d8a45; }
+    .btn.undo-btn { background:#e3e8f2; color:var(--text); }
+    .section-label { color:var(--muted); font-size:.85rem; margin:22px 0 8px; }
+    .radio-group { display:flex; gap:16px; }
+    .radio-group label { display:flex; align-items:center; gap:6px; font-weight:normal; margin:0; }
   </style>
 </head>
 <body>

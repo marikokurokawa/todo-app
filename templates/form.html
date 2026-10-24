@@ -13,6 +13,14 @@
   <label for="due_date">期日</label>
   <input type="date" id="due_date" name="due_date" value="{{ todo.due_date }}">
 
+  <label>重要度</label>
+  <div class="radio-group">
+    {% for value, label in priorities.items() %}
+      <label><input type="radio" name="priority" value="{{ value }}"
+             {% if todo.priority == value %}checked{% endif %}> {{ label }}</label>
+    {% endfor %}
+  </div>
+
   <div class="actions" style="margin-top:20px;">
     <button class="btn" type="submit">{{ "登録する" if mode == "new" else "更新する" }}</button>
     <a class="btn sub" href="{{ url_for('index') }}">一覧に戻る</a>

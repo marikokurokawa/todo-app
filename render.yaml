@@ -6,11 +6,18 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.12.4
       - key: SECRET_KEY
         generateValue: true
       - key: SPREADSHEET_ID
         sync: false
       - key: GOOGLE_CREDENTIALS_JSON
+        sync: false
+      # 課題2で追加（LINEリマインド）
+      - key: LINE_CHANNEL_ACCESS_TOKEN
+        sync: false
+      - key: LINE_USER_ID
+        sync: false
+      - key: CRON_SECRET
+        sync: false
+      - key: APP_URL
         sync: false

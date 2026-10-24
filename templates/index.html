@@ -1,31 +1,74 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="toolbar">
-  <span class="meta">全 {{ todos|length }} 件（期日が近い順）</span>
+  <div class="sortbar">
+    <form method="get" action="{{ url_for('index') }}">
+      <input type="hidden" name="show" value="{{ show }}">
+      並び順：
+      <select name="sort" onchange="this.form.submit()">
+        <option value="due" {% if sort == 'due' %}selected{% endif %}>期日が近い順</option>
+        <option value="priority" {% if sort == 'priority' %}selected{% endif %}>重要度が高い順</option>
+      </select>
+      <noscript><button class="btn small sub" type="submit">並び替え</button></noscript>
+    </form>
+  </div>
   <a class="btn" href="{{ url_for('new_todo') }}">＋ 新しいやること</a>
 </div>
 
+<div class="tabs">
+  <a class="tab {% if show == 'active' %}active{% endif %}"
+     href="{{ url_for('index', show='active', sort=sort) }}">未完了（{{ counts.active }}）</a>
+  <a class="tab {% if show == 'done' %}active{% endif %}"
+     href="{{ url_for('index', show='done', sort=sort) }}">完了（{{ counts.done }}）</a>
+  <a class="tab {% if show == 'all' %}active{% endif %}"
+     href="{{ url_for('index', show='all', sort=sort) }}">すべて（{{ counts.all }}）</a>
+</div>
+
 {% if todos %}
+  {% set ns = namespace(done_label=false) %}
   {% for t in todos %}
-    {% set overdue = t.due_date and t.due_date < today %}
-    <div class="card{% if overdue %} overdue{% endif %}">
-      <h2>{{ t.title }}</h2>
+    {% if show == 'all' and t.done and not ns.done_label %}
+      <div class="section-label">完了済み</div>
+      {% set ns.done_label = true %}
+    {% endif %}
+    {% set overdue = (not t.done) and t.due_date and t.due_date < today %}
+    <div class="card{% if overdue %} overdue{% endif %}{% if t.done %} done{% endif %}{% if t.priority == 'high' and not t.done %} priority-high{% endif %}">
+      <h2><span class="badge {{ t.priority }}">重要度：{{ t.priority_label }}</span><span class="title-text">{{ t.title }}</span></h2>
       <div class="meta">
         期日：<span class="due">{{ t.due_date or "未設定" }}</span>
-        {% if overdue %}（期限切れ）{% elif t.due_date == today %}（今日まで）{% endif %}
+        {% if t.done %}（完了）{% elif overdue %}（期限切れ）{% elif t.due_date == today %}（今日まで）{% endif %}
       </div>
       {% if t.content %}<div class="content">{{ t.content }}</div>{% endif %}
       <div class="meta">更新：{{ t.updated_at }}</div>
       <div class="actions">
+        <form method="post" action="{{ url_for('toggle_todo', todo_id=t.id) }}">
+          <input type="hidden" name="show" value="{{ show }}">
+          <input type="hidden" name="sort" value="{{ sort }}">
+          {% if t.done %}
+            <button class="btn small undo-btn" type="submit">未完了に戻す</button>
+          {% else %}
+            <button class="btn small done-btn" type="submit">✓ 完了</button>
+          {% endif %}
+        </form>
         <a class="btn small sub" href="{{ url_for('edit_todo', todo_id=t.id) }}">編集</a>
         <form method="post" action="{{ url_for('remove_todo', todo_id=t.id) }}"
               onsubmit="return confirm('「{{ t.title|e }}」を削除しますか？');">
+          <input type="hidden" name="show" value="{{ show }}">
+          <input type="hidden" name="sort" value="{{ sort }}">
           <button class="btn small danger" type="submit">削除</button>
         </form>
       </div>
     </div>
   {% endfor %}
 {% else %}
-  <div class="empty">やることはまだありません。<br>「＋ 新しいやること」から登録しましょう。</div>
+  <div class="empty">
+    {% if show == 'done' %}
+      完了したやることはまだありません。
+    {% elif show == 'active' and counts.all > 0 %}
+      未完了のやることはありません。おつかれさまでした！
+    {% else %}
+      やることはまだありません。<br>「＋ 新しいやること」から登録しましょう。
+    {% endif %}
+  </div>
 {% endif %}
 {% endblock %}
